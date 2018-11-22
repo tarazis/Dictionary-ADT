@@ -1,7 +1,7 @@
 note
 	description: "A Dictionary ADT mapping from keys to values"
-	author: "Jackie and You"
-	date: "$Date$"
+	author: "Jackie and Sami Tarazi"
+	date: "November 21, 2018"
 	revision: "$Revision$"
 
 class
@@ -33,9 +33,18 @@ feature -- Abstraction function
 			end
 			-- Your Task
 		ensure
-			consistent_model_imp_counts: True
+			consistent_model_imp_counts:
+			Result.count = count
 				-- Your Task: sizes of model and implementations the same
-			consistent_model_imp_contents: True
+			consistent_model_imp_contents:
+			across
+				keys.lower |..| keys.upper as key_index
+
+			all
+				Result.has(create {PAIR[K, V]}.make (keys[key_index.item], values[key_index.item]))
+
+			end
+
 				-- Your Task: applying the model function on each key gives back the corresponding value
 		end
 

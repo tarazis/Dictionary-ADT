@@ -1,7 +1,7 @@
 note
-	description: "Summary description for {TUPLE_ITERATION_CURSOR}."
-	author: ""
-	date: "$Date$"
+	description: "Iteration Cursor Class to implement an iterative DICTIONARY"
+	author: "Sami Tarazi"
+	date: "November 21, 2018"
 	revision: "$Revision$"
 
 class
