@@ -117,6 +117,7 @@ feature -- Tests
 			m1, m2: FUN[INTEGER, STRING]
 			entries: ARRAY[TUPLE[INTEGER, STRING]]
 		do
+			comment("test_add")
 			m1 := d.model
 			d.add_entry ("E", 6)
 			m2 := d.model
