@@ -29,6 +29,7 @@ feature -- Abstraction function
 			loop
 				Result.extend (create {PAIR[K, V]}.make (keys[key_index.item].deep_twin, values[key_index.item].deep_twin))
 
+
 			end
 			-- Your Task
 		ensure
@@ -93,6 +94,7 @@ feature -- Commands
 			-- Your Task.
 			keys.force (k, keys.upper + 1)
 			values.force (v)
+--			remove_entry(k) -- TEST
 		ensure
 			entry_added_to_model:
 				-- Your Task.
@@ -140,6 +142,7 @@ feature -- Commands
 		require
 			existing_key_in_model:
 				-- Your Task.
+			model.domain.has (k)
 		local
 			new_keys: ARRAY[K]
 			new_values: LINKED_LIST[V]
@@ -164,15 +167,19 @@ feature -- Commands
 			keys:= new_keys
 			values:= new_values
 		ensure
-			entry_removed_from_model: True
+			entry_removed_from_model:
 				-- Your Task.
 				-- Hint: Look at feature 'test_remove' in class 'EXAMPLE_DICTIONARY_TESTS'.
+				model.domain ~ (old model.domain.deep_twin).subtracted(k.deep_twin)
 		end
 
 	remove_entries(ks: SET[K])
 		require
 			existing_keys_in_model:
 				-- Your Task.
+			ks.is_subset_of (model.domain)
+		local
+
 		do
 			-- Your Task.
 
@@ -180,13 +187,15 @@ feature -- Commands
 				ks as set_element
 			loop
 				Current.remove_entry (set_element.item)
-
 			end
+
+--			Current.add_entries (entries: SET [TUPLE [K, V]])
 
 		ensure
 			entries_removed_from_model:
 				-- Your Task.
 				-- Hint: Look at feature 'test_add' in class 'EXAMPLE_DICTIONARY_TESTS'.
+				model.domain ~ (old model.domain.deep_twin).differenced (ks.deep_twin)
 		end
 
 feature -- Queries
@@ -197,8 +206,9 @@ feature -- Queries
 			-- Your Task
 			Result:= keys.count
 		ensure
-			correct_result: True
-				-- Your Task
+			correct_result:
+			Result = model.count
+
 		end
 
 	get_keys (v: V): ITERABLE[K]
@@ -220,8 +230,17 @@ feature -- Queries
 			end
 			Result:= ks
 		ensure
-			correct_result: True
+			correct_result:
 				-- Your Task: Every key in the result has the right corresponding value in model
+				(across
+					Result as key
+				all
+					model.item (key.item) ~ v
+
+				end)
+
+
+
 		end
 
 	get_value (k: K): detachable V
@@ -239,10 +258,19 @@ feature -- Queries
 
 			end
 		ensure
-			case_of_void_result: True
+			case_of_void_result:
 				-- Your Task: void result means the key does not exist in model
+				Result ~ Void
+				implies
+			not	model.domain.has (k)
+
+
+
 			case_of_non_void_result: True
 				-- Your Task: void result means the key exists in model
+				Result /~ Void
+				implies
+				model.domain.has (k)
 		end
 invariant
 	-- Do not modify these two invariants.

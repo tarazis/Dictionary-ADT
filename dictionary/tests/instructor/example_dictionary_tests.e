@@ -31,6 +31,7 @@ feature  -- Add tests
 			add_boolean_case (agent test_remove)
 			add_boolean_case (agent test_iterable_dictionary)
 			add_boolean_case (agent test_iteration_cursor)
+--			add_boolean_case (agent test_add_2)
 		end
 
 feature
@@ -130,6 +131,7 @@ feature -- Tests
 			m2 := d.model
 			Result := m2 ~ m1.unioned (create {FUN[INTEGER, STRING]}.make_from_array (entries))
 		end
+
 
 	test_remove: BOOLEAN
 		local
