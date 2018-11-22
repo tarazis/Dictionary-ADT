@@ -22,21 +22,20 @@ feature -- Abstraction function
 	model: FUN[K, V] -- Do not modify the type of this query.
 			-- Abstract the dictionary ADT as a mathematical function.
 		local
---			pair: PAIR[K, V]
 		do
 			create Result.make_empty
 			across
-				keys.lower |..| keys.upper as c1
+				keys.lower |..| keys.upper as key_index
 			loop
-				Result.extend (create {PAIR[K, V]}.make (keys[c1.item].deep_twin, values[c1.item].deep_twin))
+				Result.extend (create {PAIR[K, V]}.make (keys[key_index.item].deep_twin, values[key_index.item].deep_twin))
 
 			end
 			-- Your Task
 		ensure
-			consistent_model_imp_counts:
+			consistent_model_imp_counts: -- Your Task: sizes of model and implementations the same
 			Result.count = count
-				-- Your Task: sizes of model and implementations the same
-			consistent_model_imp_contents:
+
+			consistent_model_imp_contents: -- Your Task: applying the model function on each key gives back the corresponding value
 			across
 				keys.lower |..| keys.upper as key_index
 
@@ -45,7 +44,7 @@ feature -- Abstraction function
 
 			end
 
-				-- Your Task: applying the model function on each key gives back the corresponding value
+
 		end
 
 feature -- feature required by ITERABLE
@@ -67,8 +66,9 @@ feature -- Constructor
 
 
 		ensure
-			empty_model: True
+			empty_model:
 				-- Your Task.
+				model.is_empty
 			object_equality_for_keys:
 				-- Do not modify this.
 				keys.object_comparison
@@ -81,22 +81,41 @@ feature -- Commands
 
 	add_entry (v: V; k: K)
 		require
-			non_existing_key_in_model: True
+			non_existing_key_in_model:
 				-- Your Task.
+			not	model.domain.has (k)
+--				across
+--					model as m
+--				all
+--				not	model.has (create {PAIR[K, V]}.make (k, v))
+--				end
 		do
 			-- Your Task.
 			keys.force (k, keys.upper + 1)
 			values.force (v)
 		ensure
-			entry_added_to_model: True
+			entry_added_to_model:
 				-- Your Task.
 				-- Hint: Look at feature 'test_add' in class 'EXAMPLE_DICTIONARY_TESTS'.
+				model ~ (old model.deep_twin).extended (create {PAIR[K, V]}.make (k, v))
 		end
 
 	add_entries (entries: SET[TUPLE[k: K; v: V]])
 		require
-			non_existing_keys_in_model: True
+			non_existing_keys_in_model: -- TODO!!!
 				-- Your Task.
+				model.intersected (create {FUN[K, V]}.make_from_array (entries.as_array)).count = 0
+--				across
+--				entries.as_array	 as tuple
+--				all
+--					if attached {K} tuple.item.at(1) as k_ then
+--						not model.domain.has (k_)
+--					else
+--						true
+
+--				end
+--				end
+
 		do
 			-- Your Task.
 		across
@@ -111,9 +130,10 @@ feature -- Commands
 
 		end
 		ensure
-			entries_added_to_model: True
+			entries_added_to_model:
 				-- Your Task.
 				-- Hint: Look at feature 'test_add' in class 'EXAMPLE_DICTIONARY_TESTS'.
+				model ~ (old model.deep_twin).unioned (create {FUN[K, V]}.make_from_array (entries.as_array))
 		end
 
 	remove_entry (k: K)
